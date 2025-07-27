@@ -6,14 +6,14 @@ from pyspark.sql.functions import from_json, col
 from config import configuration
 
 def main():
-    spark = SparkSession.builder.appName("SmartCityStream") \
+    spark = SparkSession.builder.appName("SmartCityStreaming") \
         .config("spark.jars.packages",
-            "org.apache.spark:spark-sql-kafka-0_10_2.13:3.5.6,"
-            "org.apache.hadoop:hadoop-aws:3.3.1,"
-            "com.amazonaws:aws-java-sdk:1.11.469") \
+                "org.apache.spark:spark-sql-kafka-0-10_2.13:3.5.0,"
+                "org.apache.hadoop:hadoop-aws:3.3.1,"
+                "com.amazonaws:aws-java-sdk:1.11.469") \
         .config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem") \
-        .config("spark.hadoop.fs.s3a.access.key", configuration.get("AWS_ACCESS_KEY")) \
-        .config("spark.hadoop.fs.s3a.secret.key", configuration.get("AWS_SECRET_KEY")) \
+        .config("spark.hadoop.fs.s3a.access.key", configuration.get('AWS_ACCESS_KEY')) \
+        .config("spark.hadoop.fs.s3a.secret.key", configuration.get('AWS_SECRET_KEY')) \
         .config('spark.hadoop.fs.s3a.aws.credentials.provider',
                 'org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider') \
         .getOrCreate()
@@ -104,15 +104,15 @@ def main():
     emergencyDF = read_kafka_topic('emergency_data', emergencySchema).alias('emergency')
 
     query1 = streamWriter(vehicleDF, 's3a://spark-streaming-data-gg/checkpoints/vehicle_data',
-                 's3a://spark-streaming-data-gg/checkpoints/vehicle_data')
+                 's3a://spark-streaming-data-gg/data/vehicle_data')
     query2 = streamWriter(gpsDF, 's3a://spark-streaming-data-gg/checkpoints/gps_data',
-                 's3a://spark-streaming-data-gg/checkpoints/gps_data')
+                 's3a://spark-streaming-data-gg/data/gps_data')
     query3 = streamWriter(trafficDF, 's3a://spark-streaming-data-gg/checkpoints/traffic_data',
-                 's3a://spark-streaming-data-gg/checkpoints/traffic_data')
+                 's3a://spark-streaming-data-gg/data/traffic_data')
     query4 = streamWriter(weatherDF, 's3a://spark-streaming-data-gg/checkpoints/weather_data',
-                 's3a://spark-streaming-data-gg/checkpoints/weather_data')
+                 's3a://spark-streaming-data-gg/data/weather_data')
     query5 = streamWriter(emergencyDF, 's3a://spark-streaming-data-gg/checkpoints/emergency_data',
-                 's3a://spark-streaming-data-gg/checkpoints/emergency_data')
+                 's3a://spark-streaming-data-gg/data/emergency_data')
 
     query5.awaitTermination()
 
